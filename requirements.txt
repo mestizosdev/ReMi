@@ -1,0 +1,8 @@
+colorama
+cx-Oracle
+Flask
+Flask-RESTful
+Flask-SQLAlchemy
+pytest
+# Web Service Client
+suds-jurko
