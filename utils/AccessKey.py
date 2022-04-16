@@ -2,24 +2,26 @@
 
 class AccessKey(object):
 
-    def verify_document_type(access_key):
+    def document_type(access_key):
         """
-        Verifica si la clave de acceso es de una Factura, Retención, Nota de Crédito, Nota de Débito o Guía de Remisión
-        :param clave:
-        :return:
+        Is: Factura, Liquidación, Retención, Nota de Crédito, Nota de Débito or Guía de Remisión
+        :param access_key
+        :return: string
         """
-        if (access_key[8:8 + 2]) == "01":
-            return "FACTURA"
-        elif (access_key[8:8 + 2]) == "04":
-            return "NOTA DE CRÉDITO"
-        elif (access_key[8:8 + 2]) == "05":
-            return "NOTA DE DÉBITO"
-        elif (access_key[8:8 + 2]) == "06":
-            return "GUÍA DE REMISIÓN"
-        elif (access_key[8:8 + 2]) == "07":
-            return "COMPROBANTE DE RETENCIÓN"
+        if (access_key[8:8 + 2]) == '01':
+            return 'FACTURA'
+        if (access_key[8:8 + 2]) == '03':
+            return 'LIQUIDACION'
+        elif (access_key[8:8 + 2]) == '04':
+            return 'NOTA_CREDITO'
+        elif (access_key[8:8 + 2]) == '05':
+            return 'NOTA_DEBITO'
+        elif (access_key[8:8 + 2]) == '06':
+            return 'GUIA'
+        elif (access_key[8:8 + 2]) == '07':
+            return 'RETENCION'
 
-        return "NO DEFINIDO"
+        return 'not defined'
 
     def is_valid(access_key):
         """

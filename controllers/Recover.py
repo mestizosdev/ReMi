@@ -18,6 +18,6 @@ class Recover(Resource):
             return {'message': content_str}, 404
 
         authorized_file = AuthorizedFile()
-        authorized_file.save(content_str, access_key)
+        type_receipt, object_receipt = authorized_file.save(content_str, access_key)
 
         return {'Recover': 'In progress'}
