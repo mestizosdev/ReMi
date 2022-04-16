@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from suds.client import Client
+from deserializations.StatusReceipt import StatusReceipt
 import ssl
 
 
@@ -28,12 +29,13 @@ class HttpClient(object):
             request_comprobante = request_data.autorizaciones.autorizacion
             if len(request_comprobante) > 0:
 
+                self.status_receipt.access_key = request_data.claveAccesoConsultada
                 self.status_receipt.authorization = request_comprobante[0].numeroAutorizacion
                 self.status_receipt.authorization_date = str(request_comprobante[0].fechaAutorizacion)
                 self.status_receipt.status = request_comprobante[0].estado
                 self.status_receipt.receipt = str(request_comprobante[0].comprobante)
 
-                print('Clave de Acceso: ' + request_data.claveAccesoConsultada)
+                print('Clave de Acceso: ' + self.status_receipt.access_key)
                 print('Autorización: ' + self.status_receipt.authorization)
                 print('Fecha de Autorización: ' + self.status_receipt.authorization_date)
                 print('Estado: ' + self.status_receipt.status)
@@ -44,14 +46,3 @@ class HttpClient(object):
                 return False, self.status_receipt
 
 
-class StatusReceipt(object):
-    authorization = None
-    authorization_date = None
-    status = None
-    receipt = None
-
-    def __init__(self):
-        self.authorization = ''
-        self.authorization_date = ''
-        self.status = ''
-        self.receipt = ''

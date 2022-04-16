@@ -17,7 +17,8 @@ class AuthorizedFile(object):
         file.write(content_str)
         file.close()
         self.clean(path_xml)
-        return self.xml_to_object(access_key, path_xml)
+        type_receipt = AccessKey.document_type(access_key)
+        return type_receipt, path_xml
 
     def clean(self, file_xml):
         """
@@ -31,10 +32,9 @@ class AuthorizedFile(object):
             f.writelines('\n'.join(clean_lines))
         f.close
     
-    def xml_to_object(self, access_key, file_xml):
-        type_receipt = AccessKey.document_type(access_key)
+    def xml_to_object(self, file_xml):
         tree = ParseXml.parse(file_xml)
         root_receipt = tree.getroot()
 
-        return type_receipt, root_receipt
+        return root_receipt
 
