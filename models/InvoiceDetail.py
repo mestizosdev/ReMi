@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from app import db
-from sqlalchemy import ForeignKey, DateTime
+from sqlalchemy import ForeignKey
 
 
 class InvoiceDetail(db.Model):
