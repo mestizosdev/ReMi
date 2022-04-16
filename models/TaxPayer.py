@@ -2,7 +2,7 @@
 from app import db
 
 
-class Entity(db.Model):
+class TaxPayer(db.Model):
     __tablename__ = 'remi_taxpayers'
 
     id = db.Column(db.Integer, db.Identity(start=1), primary_key=True)

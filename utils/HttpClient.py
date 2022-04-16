@@ -5,9 +5,11 @@ import ssl
 
 class HttpClient(object):
     url = None
+    status_receipt = None
 
     def __init__(self):
         self.url = 'https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl'
+        self.status_receipt = StatusReceipt()
 
     def download(self, access_key):
         """
@@ -20,15 +22,36 @@ class HttpClient(object):
         request_data = client.service.autorizacionComprobante(access_key)
 
         if request_data.numeroComprobantes == "0":
-            return False, 'La clave de acceso no está registrada'
+            self.status_receipt.status = 'La clave de acceso no está registrada'
+            return False, self.status_receipt
         else:
             request_comprobante = request_data.autorizaciones.autorizacion
             if len(request_comprobante) > 0:
+
+                self.status_receipt.authorization = request_comprobante[0].numeroAutorizacion
+                self.status_receipt.authorization_date = str(request_comprobante[0].fechaAutorizacion)
+                self.status_receipt.status = request_comprobante[0].estado
+                self.status_receipt.receipt = str(request_comprobante[0].comprobante)
+
                 print('Clave de Acceso: ' + request_data.claveAccesoConsultada)
-                print('Estado: ' + request_comprobante[0].estado)
+                print('Autorización: ' + self.status_receipt.authorization)
+                print('Fecha de Autorización: ' + self.status_receipt.authorization_date)
+                print('Estado: ' + self.status_receipt.status)
 
-                return True, str(request_comprobante[0].comprobante)
+                return True, self.status_receipt
             else:
-                return False, 'El comprobante no se encuentra autorizado'
+                self.status_receipt.status = 'El comprobante no se encuentra autorizado'
+                return False, self.status_receipt
 
 
+class StatusReceipt(object):
+    authorization = None
+    authorization_date = None
+    status = None
+    receipt = None
+
+    def __init__(self):
+        self.authorization = ''
+        self.authorization_date = ''
+        self.status = ''
+        self.receipt = ''

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from utils.AccessKey import AccessKey
-import xml.etree.ElementTree as parsexml
+import xml.etree.ElementTree as ParseXml
 
 
 class AuthorizedFile(object):
@@ -32,9 +32,9 @@ class AuthorizedFile(object):
         f.close
     
     def xml_to_object(self, access_key, file_xml):
-        type = AccessKey.document_type(access_key)
-        tree = parsexml.parse(file_xml)
-        root = tree.getroot()
+        type_receipt = AccessKey.document_type(access_key)
+        tree = ParseXml.parse(file_xml)
+        root_receipt = tree.getroot()
 
-        return type, root
+        return type_receipt, root_receipt
 

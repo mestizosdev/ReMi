@@ -12,12 +12,12 @@ class Recover(Resource):
             return {'message': 'Clave de acceso no valida'}, 422
 
         client = HttpClient()
-        is_success, content_str = client.download(access_key)
+        is_success, content = client.download(access_key)
 
         if not is_success:
-            return {'message': content_str}, 404
+            return {'message': content.status}, 404
 
         authorized_file = AuthorizedFile()
-        type_receipt, object_receipt = authorized_file.save(content_str, access_key)
+        type_receipt, object_receipt = authorized_file.save(content.receipt, access_key)
 
         return {'Recover': 'In progress'}
