@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from app import api, app
 
-from controllers.index import *
-from controllers.version import *
-from controllers.recover import *
+from controllers.Index import *
+from controllers.Version import *
+from controllers.Recover import *
 
 
 def define_routers():

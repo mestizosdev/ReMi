@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from flask_restful import Resource
-from util.AccessKey import AccessKey
-from util.HttpClient import HttpClient
-from util.AuthorizedFile import AuthorizedFile
+from utils.AccessKey import AccessKey
+from utils.HttpClient import HttpClient
+from utils.AuthorizedFile import AuthorizedFile
 
 
 class Recover(Resource):
