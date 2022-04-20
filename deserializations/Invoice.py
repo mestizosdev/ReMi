@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from app import db
+from sqlalchemy import text
+
+from models.TaxPayer import TaxPayer
 from deserializations.StatusReceipt import StatusReceipt
 from utils.AuthorizedFile import AuthorizedFile
 
@@ -14,9 +18,40 @@ class Invoice(object):
         object_receipt = authorized_file.xml_to_object(file_xml)
 
         print(object_receipt.tag)
+        identification = ''
+        business_name = ''
+        address = ''
 
         for child in object_receipt.find('infoTributaria'):
-            print(child.tag, child.text)
+            if child.tag == 'ruc':
+                identification = child.text
+            if child.tag == 'razonSocial':
+                business_name = child.text
+            if child.tag == 'dirMatriz':
+                address = child.text
+
+        data = (
+            {'identification': identification,
+             'business_name': business_name,
+             'address': address},
+        )
+
+        statement = text('''INSERT INTO remi_taxpayers (
+                                identification,
+                                business_name,
+                                address,
+                                status
+                            ) VALUES (
+                                :identification,
+                                :business_name,
+                                :address,
+                                'Activo'
+                            )'''
+        )
+
+        for line in data:
+            db.session.execute(statement, line)
+        db.session.commit()
 
         for child in object_receipt.find('infoFactura'):
             print(child.tag, child.text)
