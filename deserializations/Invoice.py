@@ -44,8 +44,6 @@ class Invoice(object):
 
         taxpayer = TaxPayer.query.filter_by(identification=identification)
 
-        taxpayer_id = taxpayer.first().id
-
         if taxpayer.count() == 0:
             data = (
                 {'identification': identification,
@@ -67,6 +65,9 @@ class Invoice(object):
             for line in data:
                 result = db.session.execute(statement, line)
             db.session.commit()
+            taxpayer_id = result.id
+        else:
+            taxpayer_id = taxpayer.first().id
 
         date_emission = ''
         receptor_identification = ''
