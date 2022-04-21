@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from sqlalchemy.orm import backref
+
 from app import db
 from sqlalchemy import ForeignKey, DateTime
 
@@ -19,6 +21,11 @@ class Receipt(db.Model):
     receptor_identification = db.Column(db.String(280))
     receptor_business_name = db.Column(db.String(280))
     total = db.Column(db.Numeric, nullable=False)
+
+    invoice_detail = db.relationship(
+        'InvoiceDetail',
+        backref='invoice_detail',
+        cascade='all, delete')
 
     def __init__(self,
                  taxpayer_id,

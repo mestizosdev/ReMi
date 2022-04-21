@@ -4,6 +4,7 @@ import datetime
 from app import db
 from sqlalchemy import insert
 
+from models.InvoiceDetail import InvoiceDetail
 from models.Receipt import Receipt
 from models.TaxPayer import TaxPayer
 from deserializations.StatusReceipt import StatusReceipt
@@ -77,10 +78,12 @@ class Invoice(object):
 
         receipt = Receipt.query.filter_by(access_key=self.status_receipt.access_key)
 
+        # Delete receipt if exist
         if receipt.count() > 0:
             db.session.delete(receipt.first())
             db.session.commit()
 
+        # Create new or again receipt
         new_receipt = Receipt(taxpayer_id=taxpayer_id,
                               access_key=self.status_receipt.access_key,
                               type_receipt='FACTURA',
@@ -93,13 +96,48 @@ class Invoice(object):
                               receptor_identification=receptor_identification,
                               receptor_business_name=receptor_business_name)
 
-        db.session.add(new_receipt)
-        db.session.commit()
-
         detalles = object_receipt.iter("detalle")
 
+        line = 1
         for detalle in detalles:
             detalle_children = detalle.getchildren()
 
+            code = None
+            description = None
+            quantity = 0.0
+            unit_price = 0.0,
+            discount = 0.0,
+            price_without_tax = 0.0
+
             for elementos in detalle_children:
+                if elementos.tag == 'codigoPrincipal':
+                    code = elementos.text
+                if elementos.tag == 'descripcion':
+                    description = elementos.text
+                if elementos.tag == 'cantidad':
+                    quantity = float(elementos.text)
+                if elementos.tag == 'precioUnitario':
+                    unit_price = float(elementos.text)
+                if elementos.tag == 'descuento':
+                    discount = float(elementos.text)
+                if elementos.tag == 'precioTotalSinImpuesto':
+                    price_without_tax = float(elementos.text)
                 print(elementos.tag, elementos.text)
+
+            new_receipt.invoice_detail.append(
+                InvoiceDetail(
+                    line=line,
+                    code=code,
+                    description=description,
+                    quantity=quantity,
+                    unit_price=unit_price,
+                    discount=discount,
+                    price_without_tax=price_without_tax
+                )
+            )
+            line += 1
+
+        db.session.add(new_receipt)
+        db.session.commit()
+
+
