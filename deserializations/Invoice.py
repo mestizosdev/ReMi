@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import datetime
+
 from app import db
 from sqlalchemy import text
-from sqlalchemy.sql import func
 
+from models.Receipt import Receipt
 from models.TaxPayer import TaxPayer
 from deserializations.StatusReceipt import StatusReceipt
 from utils.AuthorizedFile import AuthorizedFile
@@ -22,6 +24,9 @@ class Invoice(object):
         identification = ''
         business_name = ''
         address = ''
+        establishment = ''
+        emission_point = ''
+        sequence = ''
 
         for child in object_receipt.find('infoTributaria'):
             if child.tag == 'ruc':
@@ -30,10 +35,18 @@ class Invoice(object):
                 business_name = child.text
             if child.tag == 'dirMatriz':
                 address = child.text
+            if child.tag == 'estab':
+                establishment = child.text
+            if child.tag == 'ptoEmi':
+                emission_point = child.text
+            if child.tag == 'secuencial':
+                sequence = child.text
 
-        count_taxpayer = TaxPayer.query.filter_by(identification=identification).count()
+        taxpayer = TaxPayer.query.filter_by(identification=identification)
 
-        if count_taxpayer == 0:
+        taxpayer_id = taxpayer.first().id
+
+        if taxpayer.count() == 0:
             data = (
                 {'identification': identification,
                  'business_name': business_name,
@@ -52,11 +65,38 @@ class Invoice(object):
                                 )''')
 
             for line in data:
-                db.session.execute(statement, line)
+                result = db.session.execute(statement, line)
             db.session.commit()
 
+        date_emission = ''
+        receptor_identification = ''
+        receptor_business_name = ''
+
         for child in object_receipt.find('infoFactura'):
+            if child.tag == 'fechaEmision':
+                date_emission = child.text
+            if child.tag == 'identificacionComprador':
+                receptor_identification = child.text
+            if child.tag == 'razonSocialComprador':
+                receptor_business_name = child.text
             print(child.tag, child.text)
+
+        receipt = Receipt(taxpayer_id=taxpayer_id,
+                          access_key=self.status_receipt.access_key,
+                          type_receipt='FACTURA',
+                          establishment=establishment,
+                          emission_point=emission_point,
+                          sequence=sequence,
+                          date_emission=datetime.datetime.now(),
+                          authorization=self.status_receipt.authorization,
+                          date_authorization=datetime.datetime.now(),
+                          receptor_identification=receptor_identification,
+                          receptor_business_name=receptor_business_name)
+
+        print(vars(receipt))
+
+        db.session.add(receipt)
+        db.session.commit()
 
         detalles = object_receipt.iter("detalle")
 
