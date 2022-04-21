@@ -68,7 +68,7 @@ class Invoice(object):
 
         for child in object_receipt.find('infoFactura'):
             if child.tag == 'fechaEmision':
-                date_emission = child.text
+                date_emission = datetime.datetime.strptime(child.text, '%d/%m/%Y').date()
             if child.tag == 'identificacionComprador':
                 receptor_identification = child.text
             if child.tag == 'razonSocialComprador':
@@ -78,7 +78,7 @@ class Invoice(object):
         receipt = Receipt.query.filter_by(access_key=self.status_receipt.access_key)
 
         if receipt.count() > 0:
-            db.session.delete(receipt)
+            db.session.delete(receipt.first())
             db.session.commit()
 
         new_receipt = Receipt(taxpayer_id=taxpayer_id,
@@ -87,13 +87,11 @@ class Invoice(object):
                               establishment=establishment,
                               emission_point=emission_point,
                               sequence=sequence,
-                              date_emission=datetime.datetime.now(),
+                              date_emission=date_emission,
                               authorization=self.status_receipt.authorization,
-                              date_authorization=datetime.datetime.now(),
+                              date_authorization=datetime.datetime.strptime(self.status_receipt.authorization_date[0:19], '%Y-%m-%d %H:%M:%S'),
                               receptor_identification=receptor_identification,
                               receptor_business_name=receptor_business_name)
-
-        print(vars(new_receipt))
 
         db.session.add(new_receipt)
         db.session.commit()
