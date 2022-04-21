@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from app import db
 from sqlalchemy import text
+from sqlalchemy.sql import func
 
 from models.TaxPayer import TaxPayer
 from deserializations.StatusReceipt import StatusReceipt
@@ -30,28 +31,29 @@ class Invoice(object):
             if child.tag == 'dirMatriz':
                 address = child.text
 
-        data = (
-            {'identification': identification,
-             'business_name': business_name,
-             'address': address},
-        )
+        count_taxpayer = TaxPayer.query.filter_by(identification=identification).count()
 
-        statement = text('''INSERT INTO remi_taxpayers (
-                                identification,
-                                business_name,
-                                address,
-                                status
-                            ) VALUES (
-                                :identification,
-                                :business_name,
-                                :address,
-                                'Activo'
-                            )'''
-        )
+        if count_taxpayer == 0:
+            data = (
+                {'identification': identification,
+                 'business_name': business_name,
+                 'address': address},)
 
-        for line in data:
-            db.session.execute(statement, line)
-        db.session.commit()
+            statement = text('''INSERT INTO remi_taxpayers (
+                                    identification,
+                                    business_name,
+                                    address,
+                                    status
+                                ) VALUES (
+                                    :identification,
+                                    :business_name,
+                                    :address,
+                                    'Activo'
+                                )''')
+
+            for line in data:
+                db.session.execute(statement, line)
+            db.session.commit()
 
         for child in object_receipt.find('infoFactura'):
             print(child.tag, child.text)
