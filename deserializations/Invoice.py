@@ -2,7 +2,7 @@
 import datetime
 
 from app import db
-from sqlalchemy import text
+from sqlalchemy import insert
 
 from models.Receipt import Receipt
 from models.TaxPayer import TaxPayer
@@ -44,28 +44,21 @@ class Invoice(object):
 
         taxpayer = TaxPayer.query.filter_by(identification=identification)
 
+        taxpayer_id = 0
         if taxpayer.count() == 0:
-            data = (
-                {'identification': identification,
-                 'business_name': business_name,
-                 'address': address},)
+            statement = (
+                insert(TaxPayer).values(
+                    identification=identification,
+                    business_name=business_name,
+                    address=address
+                )
+            )
 
-            statement = text('''INSERT INTO remi_taxpayers (
-                                    identification,
-                                    business_name,
-                                    address,
-                                    status
-                                ) VALUES (
-                                    :identification,
-                                    :business_name,
-                                    :address,
-                                    'Activo'
-                                )''')
-
-            for line in data:
-                result = db.session.execute(statement, line)
+            result = db.session.execute(statement)
             db.session.commit()
-            taxpayer_id = result.id
+
+            for row in result.inserted_primary_key:
+                taxpayer_id = row
         else:
             taxpayer_id = taxpayer.first().id
 
@@ -82,21 +75,27 @@ class Invoice(object):
                 receptor_business_name = child.text
             print(child.tag, child.text)
 
-        receipt = Receipt(taxpayer_id=taxpayer_id,
-                          access_key=self.status_receipt.access_key,
-                          type_receipt='FACTURA',
-                          establishment=establishment,
-                          emission_point=emission_point,
-                          sequence=sequence,
-                          date_emission=datetime.datetime.now(),
-                          authorization=self.status_receipt.authorization,
-                          date_authorization=datetime.datetime.now(),
-                          receptor_identification=receptor_identification,
-                          receptor_business_name=receptor_business_name)
+        receipt = Receipt.query.filter_by(access_key=self.status_receipt.access_key)
 
-        print(vars(receipt))
+        if receipt.count() > 0:
+            db.session.delete(receipt)
+            db.session.commit()
 
-        db.session.add(receipt)
+        new_receipt = Receipt(taxpayer_id=taxpayer_id,
+                              access_key=self.status_receipt.access_key,
+                              type_receipt='FACTURA',
+                              establishment=establishment,
+                              emission_point=emission_point,
+                              sequence=sequence,
+                              date_emission=datetime.datetime.now(),
+                              authorization=self.status_receipt.authorization,
+                              date_authorization=datetime.datetime.now(),
+                              receptor_identification=receptor_identification,
+                              receptor_business_name=receptor_business_name)
+
+        print(vars(new_receipt))
+
+        db.session.add(new_receipt)
         db.session.commit()
 
         detalles = object_receipt.iter("detalle")

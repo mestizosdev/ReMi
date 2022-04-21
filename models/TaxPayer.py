@@ -10,16 +10,13 @@ class TaxPayer(db.Model):
     business_name = db.Column(db.String(280), nullable=False)
     trade_name = db.Column(db.String(280))
     address = db.Column(db.String(280), nullable=False)
-    status = db.Column(db.String(280), nullable=False)
 
     def __init__(self,
                  identification,
                  business_name,
                  address,
-                 trade_name=None,
-                 status='Activo'):
+                 trade_name=None):
         self.identification = identification,
         self.business_name = business_name,
         self.trade_name = trade_name,
-        self.address = address,
-        self.status = status,
+        self.address = address
