@@ -32,3 +32,27 @@ class AccessKey(object):
             return True
         else:
             return False
+
+    def get_identification(access_key):
+        """
+        Extract identification
+        :param access_key:
+        :return identification:
+        """
+        return access_key[10:10 + 13]
+
+    def get_year(access_key):
+        """
+        Extract year
+        :param access_key:
+        :return identification:
+        """
+        return access_key[4:4 + 4]
+
+    def get_month(access_key):
+        """
+        Extract month
+        :param access_key:
+        :return identification:
+        """
+        return access_key[2:2 + 2]

@@ -11,7 +11,7 @@ class AuthorizedFile(object):
         self.path_received = '/app/ReMi/received'
 
     def save(self, content_str, access_key):
-        path_xml = self.path_received + os.sep + access_key + '.xml'
+        path_xml = self.create_directories(access_key)
         print("Path of XML: " + path_xml)
         file = open(path_xml, "w")
         file.write(content_str)
@@ -19,6 +19,19 @@ class AuthorizedFile(object):
         self.clean(path_xml)
         type_receipt = AccessKey.document_type(access_key)
         return type_receipt, path_xml
+
+    def create_directories(self, access_key):
+        identification = AccessKey.get_identification(access_key)
+        year = AccessKey.get_year(access_key)
+        month = AccessKey.get_month(access_key)
+        directory = self.path_received + os.sep + identification + os.sep + year + os.sep + month
+        exist = os.path.exists(directory)
+
+        if not exist:
+            os.makedirs(directory)
+
+        path_xml = directory + os.sep + access_key + '.xml'
+        return path_xml
 
     def clean(self, file_xml):
         """

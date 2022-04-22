@@ -30,4 +30,4 @@ class Recover(Resource):
             return {'receipt': receipt_id}
 
         except Exception as e:
-            return str(e), 501
+            return {'message': str(e)}, 501
