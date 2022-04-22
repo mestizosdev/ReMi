@@ -149,3 +149,5 @@ class Invoice(object):
 
         db.session.add(new_receipt)
         db.session.commit()
+
+        return new_receipt.id

@@ -16,3 +16,8 @@ migrate = Migrate(app, db)
 from routes.router import define_routers
 
 define_routers()
+
+# Logger
+from utils.logger import define_logger
+
+define_logger()
