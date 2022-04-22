@@ -16,6 +16,11 @@ class InvoiceDetail(db.Model):
     discount = db.Column(db.Numeric(30, 4), nullable=False)
     price_without_tax = db.Column(db.Numeric(30, 4), nullable=False)
 
+    tax = db.relationship(
+        'Tax',
+        backref='tax',
+        cascade='all, delete')
+
     def __init__(self,
                  line,
                  code,

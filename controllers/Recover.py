@@ -3,7 +3,7 @@ from flask_restful import Resource
 from utils.AccessKey import AccessKey
 from utils.HttpClient import HttpClient
 from utils.AuthorizedFile import AuthorizedFile
-from deserializations.Invoice import Invoice
+from recovers.Invoice import Invoice
 
 
 class Recover(Resource):

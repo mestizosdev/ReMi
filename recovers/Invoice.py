@@ -6,8 +6,9 @@ from sqlalchemy import insert
 
 from models.InvoiceDetail import InvoiceDetail
 from models.Receipt import Receipt
+from models.Tax import Tax
 from models.TaxPayer import TaxPayer
-from deserializations.StatusReceipt import StatusReceipt
+from recovers.StatusReceipt import StatusReceipt
 from utils.AuthorizedFile import AuthorizedFile
 
 
@@ -101,6 +102,7 @@ class Invoice(object):
         line = 1
         for detalle in detalles:
             detalle_children = detalle.getchildren()
+            invoice_detail = None
 
             code = None
             description = None
@@ -124,8 +126,7 @@ class Invoice(object):
                     price_without_tax = float(elementos.text)
                 print(elementos.tag, elementos.text)
 
-            new_receipt.invoice_detail.append(
-                InvoiceDetail(
+                invoice_detail = InvoiceDetail(
                     line=line,
                     code=code,
                     description=description,
@@ -134,7 +135,29 @@ class Invoice(object):
                     discount=discount,
                     price_without_tax=price_without_tax
                 )
-            )
+
+                if elementos.tag == 'impuestos':
+                    taxes_details = []
+                    for impuestos in elementos:
+                        code_tax = ''
+                        code_percent = ''
+                        impuesto_children = impuestos.getchildren()
+                        for impuesto in impuesto_children:
+                            if impuesto.tag == 'codigo':
+                                code_tax = impuesto.text
+                            if impuesto.tag == 'codigoPorcentaje':
+                                code_percent = impuesto.text
+                            print(" ", impuesto.tag, impuesto.text)
+                        # taxes_details.append(
+                        #     Tax(
+                        #         code=code_tax,
+                        #         code_percent=code_percent,
+                        #         tariff=0,
+                        #         base_value=0,
+                        #         value=0
+                        #     ))
+
+            new_receipt.invoice_detail.append(invoice_detail)
             line += 1
 
         db.session.add(new_receipt)

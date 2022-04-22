@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from suds.client import Client
-from deserializations.StatusReceipt import StatusReceipt
+from recovers.StatusReceipt import StatusReceipt
 import ssl
 
 
