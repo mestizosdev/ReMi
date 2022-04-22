@@ -136,8 +136,9 @@ class Invoice(object):
                     price_without_tax=price_without_tax
                 )
 
+                invoice_detail.tax.append(Tax(code='2', code_percent='2'))
+
                 if elementos.tag == 'impuestos':
-                    taxes_details = []
                     for impuestos in elementos:
                         code_tax = ''
                         code_percent = ''
@@ -148,14 +149,15 @@ class Invoice(object):
                             if impuesto.tag == 'codigoPorcentaje':
                                 code_percent = impuesto.text
                             print(" ", impuesto.tag, impuesto.text)
-                        # taxes_details.append(
-                        #     Tax(
-                        #         code=code_tax,
-                        #         code_percent=code_percent,
-                        #         tariff=0,
-                        #         base_value=0,
-                        #         value=0
-                        #     ))
+                        invoice_detail.tax.append(
+                            TTax(
+                                code=code_tax,
+                                code_percent=code_percent,
+                                tariff=0,
+                                base_value=0,
+                                value=0
+                            )
+                        )
 
             new_receipt.invoice_detail.append(invoice_detail)
             line += 1

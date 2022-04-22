@@ -16,10 +16,8 @@ class Tax(db.Model):
 
     def __init__(self,
                  code,
-                 code_percent,
-                 tariff,
-                 base_value,
-                 value):
+                 code_percent
+                 ):
         self.code = code,
         self.code_percent = code_percent,
         self.tariff = tariff,
