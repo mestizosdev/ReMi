@@ -86,11 +86,11 @@ class Invoice(object):
                               receptor_identification=receptor_identification,
                               receptor_business_name=receptor_business_name)
 
-        detalles = object_receipt.iter("detalle")
+        details = object_receipt.iter("detalle")
 
         line = 1
-        for detalle in detalles:
-            detalle_children = detalle.getchildren()
+        for detail in details:
+            children_detail = detail.getchildren()
             invoice_detail = None
 
             code = None
@@ -100,20 +100,20 @@ class Invoice(object):
             discount = 0.0,
             price_without_tax = 0.0
 
-            for elementos in detalle_children:
-                if elementos.tag == 'codigoPrincipal':
-                    code = elementos.text
-                if elementos.tag == 'descripcion':
-                    description = elementos.text
-                if elementos.tag == 'cantidad':
-                    quantity = float(elementos.text)
-                if elementos.tag == 'precioUnitario':
-                    unit_price = float(elementos.text)
-                if elementos.tag == 'descuento':
-                    discount = float(elementos.text)
-                if elementos.tag == 'precioTotalSinImpuesto':
-                    price_without_tax = float(elementos.text)
-                print(elementos.tag, elementos.text)
+            for element_tax in children_detail:
+                if element_tax.tag == 'codigoPrincipal':
+                    code = element_tax.text
+                if element_tax.tag == 'descripcion':
+                    description = element_tax.text
+                if element_tax.tag == 'cantidad':
+                    quantity = float(element_tax.text)
+                if element_tax.tag == 'precioUnitario':
+                    unit_price = float(element_tax.text)
+                if element_tax.tag == 'descuento':
+                    discount = float(element_tax.text)
+                if element_tax.tag == 'precioTotalSinImpuesto':
+                    price_without_tax = float(element_tax.text)
+                print(element_tax.tag, element_tax.text)
 
                 invoice_detail = InvoiceDetail(
                     line=line,
@@ -125,22 +125,22 @@ class Invoice(object):
                     price_without_tax=price_without_tax
                 )
                 # Recover taxes
-                if elementos.tag == 'impuestos':
+                if element_tax.tag == 'impuestos':
                     tax_detail = []
-                    for impuestos in elementos:
-                        impuesto_children = impuestos.getchildren()
+                    for taxes_details in element_tax:
+                        tax_children = taxes_details.getchildren()
                         tax = Tax()
-                        for impuesto in impuesto_children:
-                            if impuesto.tag == 'codigo':
-                                tax.code = impuesto.text
-                            if impuesto.tag == 'codigoPorcentaje':
-                                tax.code_percent = impuesto.text
-                            if impuesto.tag == 'tarifa':
-                                tax.tariff = impuesto.text
-                            if impuesto.tag == 'baseImponible':
-                                tax.base_value = impuesto.text
-                            if impuesto.tag == 'valor':
-                                tax.value = impuesto.text
+                        for tax_element in tax_children:
+                            if tax_element.tag == 'codigo':
+                                tax.code = tax_element.text
+                            if tax_element.tag == 'codigoPorcentaje':
+                                tax.code_percent = tax_element.text
+                            if tax_element.tag == 'tarifa':
+                                tax.tariff = tax_element.text
+                            if tax_element.tag == 'baseImponible':
+                                tax.base_value = tax_element.text
+                            if tax_element.tag == 'valor':
+                                tax.value = tax_element.text
                         tax_detail.append(tax)
                     invoice_detail.tax = tax_detail
 
@@ -149,4 +149,3 @@ class Invoice(object):
 
         db.session.add(new_receipt)
         db.session.commit()
-
