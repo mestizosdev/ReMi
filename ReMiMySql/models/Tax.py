@@ -15,11 +15,11 @@ class Tax(db.Model):
     value = db.Column(db.Numeric(10, 6), nullable=False)
 
     def __init__(self,
-                 code,
-                 code_percent,
-                 tariff,
-                 base_value,
-                 value):
+                 code='',
+                 code_percent='',
+                 tariff=0.0,
+                 base_value=0.0,
+                 value=0.0):
         self.code = code,
         self.code_percent = code_percent,
         self.tariff = tariff,

@@ -12,10 +12,10 @@ class TaxPayer(db.Model):
     address = db.Column(db.String(280), nullable=False)
 
     def __init__(self,
-                 identification,
-                 business_name,
-                 address,
-                 trade_name=None):
+                 identification='',
+                 business_name='',
+                 trade_name=None,
+                 address=''):
         self.identification = identification,
         self.business_name = business_name,
         self.trade_name = trade_name,

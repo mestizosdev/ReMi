@@ -2,7 +2,6 @@
 import datetime
 
 from app import db
-from sqlalchemy import insert
 
 from models.InvoiceDetail import InvoiceDetail
 from models.Receipt import Receipt
@@ -22,21 +21,20 @@ class Invoice(object):
         authorized_file = AuthorizedFile()
         object_receipt = authorized_file.xml_to_object(file_xml)
 
-        print(object_receipt.tag)
-        identification = ''
-        business_name = ''
-        address = ''
+        incoming_taxpayer = TaxPayer()
         establishment = ''
         emission_point = ''
         sequence = ''
 
         for child in object_receipt.find('infoTributaria'):
             if child.tag == 'ruc':
-                identification = child.text
+                incoming_taxpayer.identification = child.text
             if child.tag == 'razonSocial':
-                business_name = child.text
+                incoming_taxpayer.business_name = child.text
+            if child.tag == 'nombreComercial':
+                incoming_taxpayer.trade_name = child.text
             if child.tag == 'dirMatriz':
-                address = child.text
+                incoming_taxpayer.address = child.text
             if child.tag == 'estab':
                 establishment = child.text
             if child.tag == 'ptoEmi':
@@ -44,23 +42,14 @@ class Invoice(object):
             if child.tag == 'secuencial':
                 sequence = child.text
 
-        taxpayer = TaxPayer.query.filter_by(identification=identification)
+        taxpayer = TaxPayer.query.filter_by(identification=incoming_taxpayer.identification)
 
-        taxpayer_id = 0
+        taxpayer_id = None
         if taxpayer.count() == 0:
-            statement = (
-                insert(TaxPayer).values(
-                    identification=identification,
-                    business_name=business_name,
-                    address=address
-                )
-            )
-
-            result = db.session.execute(statement)
+            db.session.add(incoming_taxpayer)
             db.session.commit()
 
-            for row in result.inserted_primary_key:
-                taxpayer_id = row
+            taxpayer_id = incoming_taxpayer.id
         else:
             taxpayer_id = taxpayer.first().id
 
@@ -135,23 +124,29 @@ class Invoice(object):
                     discount=discount,
                     price_without_tax=price_without_tax
                 )
-
+                # Recover taxes
                 if elementos.tag == 'impuestos':
+                    tax_detail = []
                     for impuestos in elementos:
-                        code_tax = ''
-                        code_percent = ''
                         impuesto_children = impuestos.getchildren()
+                        tax = Tax()
                         for impuesto in impuesto_children:
                             if impuesto.tag == 'codigo':
-                                code_tax = impuesto.text
+                                tax.code = impuesto.text
                             if impuesto.tag == 'codigoPorcentaje':
-                                code_percent = impuesto.text
-                            print(" ", impuesto.tag, impuesto.text)
+                                tax.code_percent = impuesto.text
+                            if impuesto.tag == 'tarifa':
+                                tax.tariff = impuesto.text
+                            if impuesto.tag == 'baseImponible':
+                                tax.base_value = impuesto.text
+                            if impuesto.tag == 'valor':
+                                tax.value = impuesto.text
+                        tax_detail.append(tax)
+                    invoice_detail.tax = tax_detail
 
             new_receipt.invoice_detail.append(invoice_detail)
             line += 1
 
         db.session.add(new_receipt)
         db.session.commit()
-
 
