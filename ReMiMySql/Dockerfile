@@ -1,0 +1,13 @@
+FROM python:3.8.13-buster
+
+RUN apt update && apt -y upgrade \
+#     && apt install -y python3 python3-pip \
+    && pip3 install --upgrade pip
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip3 --no-cache-dir install -r requirements.txt
+
+CMD ["flask", "run", "-h", "0.0.0.0"]
