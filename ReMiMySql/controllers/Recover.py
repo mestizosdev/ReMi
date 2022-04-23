@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask_restful import Resource
+import logging
+logger = logging.getLogger(__name__)
 from utils.AccessKey import AccessKey
 from utils.HttpClient import HttpClient
 from utils.AuthorizedFile import AuthorizedFile
@@ -27,7 +29,9 @@ class Recover(Resource):
                 invoice = Invoice(status_receipt)
                 receipt_id = invoice.deserialize(file_xml)
 
-            return {'receipt': receipt_id}
+            return {'receipt': receipt_id,
+                    'type_receipt': type_receipt}
 
         except Exception as e:
+            logger.error(e)
             return {'message': str(e)}, 501

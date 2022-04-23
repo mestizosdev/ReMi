@@ -64,7 +64,7 @@ class Invoice(object):
                 receptor_identification = child.text
             if child.tag == 'razonSocialComprador':
                 receptor_business_name = child.text
-            print(child.tag, child.text)
+            # print(child.tag, child.text)
 
         receipt = Receipt.query.filter_by(access_key=self.status_receipt.access_key)
 
@@ -113,7 +113,7 @@ class Invoice(object):
                     discount = float(element_tax.text)
                 if element_tax.tag == 'precioTotalSinImpuesto':
                     price_without_tax = float(element_tax.text)
-                print(element_tax.tag, element_tax.text)
+                # print(element_tax.tag, element_tax.text)
 
                 invoice_detail = InvoiceDetail(
                     line=line,

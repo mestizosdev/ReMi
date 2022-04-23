@@ -14,7 +14,7 @@ def define_logger():
     filename = os.path.join(os.path.realpath("."),
                             'logs',
                             'server.log')
-    logging.basicConfig(level=logging.DEBUG,
+    logging.basicConfig(level=logging.WARN,
                         format="[%(levelname)s] %(asctime)s %(message)s",
                         handlers=[
                             logging.FileHandler(filename),
