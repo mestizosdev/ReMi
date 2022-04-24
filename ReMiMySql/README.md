@@ -9,3 +9,16 @@ Recover SRI XML receipts
 ```
 uwsgi --ini ./remi.ini
 ```
+
+## MySql
+```
+CREATE SCHEMA `remi` DEFAULT CHARACTER SET utf8 ;
+
+CREATE USER 'remi'@'%' IDENTIFIED BY 'remiremi';
+
+GRANT ALL PRIVILEGES ON remi.* TO 'remi'@'%' WITH GRANT OPTION;
+
+ALTER USER 'remi'@'%' IDENTIFIED BY 'remiremi';
+
+FLUSH PRIVILEGES;
+```
