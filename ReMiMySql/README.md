@@ -22,3 +22,17 @@ ALTER USER 'remi'@'%' IDENTIFIED BY 'No_piratear1';
 
 FLUSH PRIVILEGES;
 ```
+## Docker
+```
+docker build -t remi .
+docker run -it --publish 5000:5000 remi
+docker logs pedantic_colden
+```
+with system variables
+```
+docker run -it -e 'DB_HOST=172.17.0.1' -p 5000:5000 remi
+```
+## Firewall ufw 
+```
+ufw allow in on docker0 to any port 3306
+```
