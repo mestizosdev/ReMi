@@ -14,11 +14,11 @@ uwsgi --ini ./remi.ini
 ```
 CREATE SCHEMA `remi` DEFAULT CHARACTER SET utf8 ;
 
-CREATE USER 'remi'@'%' IDENTIFIED BY 'remiremi';
+CREATE USER 'remi'@'%' IDENTIFIED BY 'No_piratear1';
 
 GRANT ALL PRIVILEGES ON remi.* TO 'remi'@'%' WITH GRANT OPTION;
 
-ALTER USER 'remi'@'%' IDENTIFIED BY 'remiremi';
+ALTER USER 'remi'@'%' IDENTIFIED BY 'No_piratear1';
 
 FLUSH PRIVILEGES;
 ```
