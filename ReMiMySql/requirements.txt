@@ -9,3 +9,4 @@ suds-jurko
 # MySQL
 PyMySQL
 cryptography
+gunicorn

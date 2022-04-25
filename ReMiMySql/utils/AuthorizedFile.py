@@ -2,13 +2,14 @@
 import os
 from utils.AccessKey import AccessKey
 import xml.etree.ElementTree as ParseXml
+from app import app
 
 
 class AuthorizedFile(object):
     path_received = None
 
     def __init__(self):
-        self.path_received = '/app/ReMi/received'
+        self.path_received = app.config['PATH_DATA'] + os.sep + 'received'
 
     def save(self, content_str, access_key):
         path_xml = self.create_directories(access_key)

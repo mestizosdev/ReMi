@@ -36,3 +36,7 @@ docker run -it -e 'DB_HOST=172.17.0.1' -p 5000:5000 remi
 ```
 ufw allow in on docker0 to any port 3306
 ```
+## Run in production mode
+```
+gunicorn --bind=0.0.0.0:5000 app:app
+```

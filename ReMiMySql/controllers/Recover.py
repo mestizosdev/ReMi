@@ -33,5 +33,5 @@ class Recover(Resource):
                     'type_receipt': type_receipt}
 
         except Exception as e:
-            logger.error(e)
+            logger.error('Recover ' + access_key + ' ' + str(e))
             return {'message': str(e)}, 501
