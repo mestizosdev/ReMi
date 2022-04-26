@@ -7,7 +7,8 @@ Recover SRI XML receipts
 
 ## MySql
 ```
-mysql -h localhost -P 3306 --user=root --password=No_piratear1 
+mysql -h localhost -P 3306 --user=root --password=No_piratear1
+mycli -h 172.17.0.1 -u remi -p No_piratear1
 ```
 List databases
 ```
@@ -66,6 +67,13 @@ docker logs pedantic_colden
 with system variables
 ```
 docker run -it -e 'DB_HOST=172.17.0.1' -p 5000:5000 remi
+```
+## Docker compose
+```
+docker-compose down
+```
+```
+docker-compose up -d
 ```
 ## Firewall ufw 
 ```

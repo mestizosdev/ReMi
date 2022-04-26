@@ -1,7 +1,7 @@
-FROM python:3.8.13-buster
-
+FROM python:3.8-slim-buster
 RUN apt update && apt -y upgrade \
 #     && apt install -y python3 python3-pip \
+    && apt install -y mycli net-tools iputils-ping \
     && pip3 install --upgrade pip
 
 WORKDIR /app
