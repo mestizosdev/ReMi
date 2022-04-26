@@ -3,24 +3,59 @@ Recover SRI XML receipts
 
 ## Software
 * Python 3.6 or above
-* MySql 5 or above
-
-## uWSGI
-```
-uwsgi --ini ./remi.ini
-```
+* MySql 5 or Mariadb 5 or above
 
 ## MySql
 ```
-CREATE SCHEMA `remi` DEFAULT CHARACTER SET utf8 ;
+mysql -h localhost -P 3306 --user=root --password=No_piratear1 
+```
+List databases
+```
+show databases;
+```
+List users
+```
+SELECT User, Host, Password FROM mysql.user;
+```
+```
+CREATE SCHEMA `remi`;
 
 CREATE USER 'remi'@'%' IDENTIFIED BY 'No_piratear1';
 
 GRANT ALL PRIVILEGES ON remi.* TO 'remi'@'%' WITH GRANT OPTION;
 
 ALTER USER 'remi'@'%' IDENTIFIED BY 'No_piratear1';
-
+```
+update password for Mariadb
+```
+set password for 'remi'@'%' = password('No_piratear1');
+```
+```
 FLUSH PRIVILEGES;
+```
+### Create virualenv (bash, zsh, ...)
+```
+virtualenv venv
+```
+```
+. ./venv/bin/activate
+```
+### Migrate database
+```
+flask db init
+```
+```
+flask db migrate
+```
+```
+flask db upgrade
+```
+### Configuration (bash, zsh, ...)
+```
+export FLASK_APP=app
+```
+```
+export FLASK_ENV=development
 ```
 ## Docker
 ```
