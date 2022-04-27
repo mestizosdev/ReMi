@@ -10,12 +10,19 @@ services:
     image: remi
     container_name: remi_slim
     volumes:
-      - /app:/app/data
+#     - /host/path:/container/path
+      - /app/data/remi:/app/data
+      - /app/data/remi/logs:/app/logs
     network_mode: bridge
     ports:
-      - "5000:5000"
+#     - localPort:containerPort
+      - "4001:5000"
     environment:
       DB_HOST: 'host.docker.internal'
+      DB_USER: 'remi'
+      DB_PASSWORD: 'Mi_Secreto0'
+      DB_PORT: '3306'
+      DB_NAME: 'remi'
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
