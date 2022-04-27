@@ -7,8 +7,8 @@ Recover SRI XML receipts
 
 ## MySql
 ```
-mysql -h localhost -P 3306 --user=root --password=No_piratear1
-mycli -h 172.17.0.1 -u remi -p No_piratear1
+mysql -h localhost -P 3306 --user=root --password=Mi_Secreto0
+mycli -h 172.17.0.1 -u remi -p Mi_Secreto0
 ```
 List databases
 ```
@@ -21,15 +21,15 @@ SELECT User, Host, Password FROM mysql.user;
 ```
 CREATE SCHEMA `remi`;
 
-CREATE USER 'remi'@'%' IDENTIFIED BY 'No_piratear1';
+CREATE USER 'remi'@'%' IDENTIFIED BY 'Mi_Secreto0';
 
 GRANT ALL PRIVILEGES ON remi.* TO 'remi'@'%' WITH GRANT OPTION;
 
-ALTER USER 'remi'@'%' IDENTIFIED BY 'No_piratear1';
+ALTER USER 'remi'@'%' IDENTIFIED BY 'Mi_Secreto0';
 ```
 update password for Mariadb
 ```
-set password for 'remi'@'%' = password('No_piratear1');
+set password for 'remi'@'%' = password('Mi_Secreto0');
 ```
 ```
 FLUSH PRIVILEGES;
