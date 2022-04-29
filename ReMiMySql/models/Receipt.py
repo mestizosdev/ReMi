@@ -51,3 +51,22 @@ class Receipt(db.Model):
         self.receptor_business_name = receptor_business_name
         self.total = total
 
+    def serialize(self):
+        receipt = {
+            'id': self.id,
+            'access_key': self.access_key,
+            'taxpayer_id': self.taxpayer_id,
+            'access_key': self.access_key,
+            'type_receipt': self.type_receipt,
+            'establishment': self.establishment,
+            'emission_point': self.emission_point,
+            'sequence': self.sequence,
+            # 'date_emission': self.date_emission,
+            'authorization': self.authorization,
+            # 'date_authorization': self.date_authorization,
+            'receptor_identification': self.receptor_identification,
+            'receptor_business_name': self.receptor_business_name
+            # 'total': self.total
+        }
+
+        return receipt

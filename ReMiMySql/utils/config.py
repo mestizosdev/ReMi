@@ -18,4 +18,5 @@ def vars_config(app):
         print('Run in production mode')
     else:
         print('FLASK_ENV', os.getenv('FLASK_ENV'))
+        print(app.config['SQLALCHEMY_ECHO'])
     return app

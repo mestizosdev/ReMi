@@ -6,6 +6,7 @@ from utils.AccessKey import AccessKey
 from utils.HttpClient import HttpClient
 from utils.AuthorizedFile import AuthorizedFile
 from recovers.Invoice import Invoice
+from models.Receipt import Receipt
 
 
 class Recover(Resource):
@@ -29,8 +30,12 @@ class Recover(Resource):
                 invoice = Invoice(status_receipt)
                 receipt_id = invoice.deserialize(file_xml)
 
-            return {'receipt': receipt_id,
-                    'type_receipt': type_receipt}
+            receipt = Receipt.query.filter_by(id=receipt_id).first()
+
+            print('receipt', receipt)
+
+            return {'type_receipt': type_receipt,
+                    'receipt': receipt.serialize()}
 
         except Exception as e:
             logger.error('Recover ' + access_key + ' ' + str(e))
