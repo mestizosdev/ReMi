@@ -31,12 +31,14 @@ class Recover(Resource):
                 invoice = Invoice(status_receipt)
                 receipt_id = invoice.deserialize(file_xml)
 
-            receipt = Receipt.query.filter_by(id=receipt_id).first()
-            tax_payer = TaxPayer.query.filter_by(id=receipt.taxpayer_id).first()
+                receipt = Receipt.query.filter_by(id=receipt_id).first()
+                tax_payer = TaxPayer.query.filter_by(id=receipt.taxpayer_id).first()
 
-            return {'type_receipt': type_receipt,
-                    'receipt': receipt.serialize(),
-                    'supplier': tax_payer.serialize()}
+                return {'type_receipt': type_receipt,
+                        'receipt': receipt.serialize(),
+                        'supplier': tax_payer.serialize()}
+            else:
+                return {'message': 'No implementado'}, 404
 
         except Exception as e:
             logger.error('Recover ' + access_key + ' ' + str(e))
