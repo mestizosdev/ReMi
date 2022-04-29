@@ -20,3 +20,14 @@ class TaxPayer(db.Model):
         self.business_name = business_name,
         self.trade_name = trade_name,
         self.address = address
+
+    def serialize(self):
+        tax_payer = {
+            'id': self.id,
+            'identification': self.identification,
+            'business_name': self.business_name,
+            'trade_name': self.trade_name,
+            'address': self.address
+        }
+
+        return tax_payer

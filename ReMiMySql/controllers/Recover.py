@@ -7,6 +7,7 @@ from utils.HttpClient import HttpClient
 from utils.AuthorizedFile import AuthorizedFile
 from recovers.Invoice import Invoice
 from models.Receipt import Receipt
+from models.TaxPayer import TaxPayer
 
 
 class Recover(Resource):
@@ -31,11 +32,11 @@ class Recover(Resource):
                 receipt_id = invoice.deserialize(file_xml)
 
             receipt = Receipt.query.filter_by(id=receipt_id).first()
-
-            print('receipt', receipt)
+            tax_payer = TaxPayer.query.filter_by(id=receipt.taxpayer_id).first()
 
             return {'type_receipt': type_receipt,
-                    'receipt': receipt.serialize()}
+                    'receipt': receipt.serialize(),
+                    'supplier': tax_payer.serialize()}
 
         except Exception as e:
             logger.error('Recover ' + access_key + ' ' + str(e))

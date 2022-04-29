@@ -19,6 +19,7 @@ class InvoiceDetail(db.Model):
     tax = db.relationship(
         'Tax',
         backref='tax',
+        lazy='dynamic',
         cascade='all, delete')
 
     def __init__(self,
