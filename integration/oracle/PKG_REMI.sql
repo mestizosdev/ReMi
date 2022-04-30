@@ -16,6 +16,11 @@ CREATE OR REPLACE PACKAGE pkg_remi AS
         p_clob CLOB,
         p_supplier_id number
     ) RETURN NUMBER;
+    
+    procedure pro_invoice_detail (
+        p_clob CLOB,
+        p_receipt_id number
+    );
 
     FUNCTION fun_save_supplier (
         p_identification VARCHAR2,
@@ -70,6 +75,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
             v_supplier := fun_supplier(v_clob);
             dbms_output.put_line('Supplier id ' || v_supplier);
             v_receipt := fun_receipt(v_clob, v_supplier);
+            dbms_output.put_line('Receipt id ' || v_receipt);
+            pro_invoice_detail(v_clob, v_receipt);
         ELSE
             apex_json.parse(v_clob);
             RETURN apex_json.get_varchar2(p_path => 'message');
@@ -211,17 +218,14 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
         v_sequence                VARCHAR2(50);
         v_date_emission           DATE;
         v_authorization           VARCHAR2(100);
-        v_date_authorization           DATE;
+        v_date_authorization      DATE;
         v_receptor_identification VARCHAR2(50);
         v_receptor_business_name  VARCHAR2(500);
+        v_receipt_id              NUMBER;
     BEGIN
         apex_json.parse(p_clob);
         v_members := apex_json.get_members(p_path => 'receipt');
         FOR i IN 1..v_members.count LOOP
---            dbms_output.put_line(v_members(i)
---                                 || ' '
---                                 || apex_json.get_varchar2(p_path => 'receipt.' || v_members(i)));
-
             IF v_members(i) = 'type_receipt' THEN
                 v_type_receipt := apex_json.get_varchar2(p_path => 'receipt.' || v_members(i));
 
@@ -239,6 +243,10 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
                 v_authorization := apex_json.get_varchar2(p_path => 'receipt.' || v_members(i));
             ELSIF v_members(i) = 'date_authorization' THEN
                 v_date_authorization := apex_json.get_date(p_path => 'receipt.' || v_members(i));
+            ELSIF v_members(i) = 'receptor_identification' THEN
+                v_receptor_identification := apex_json.get_varchar2(p_path => 'receipt.' || v_members(i));
+            ELSIF v_members(i) = 'receptor_business_name' THEN
+                v_receptor_business_name := apex_json.get_varchar2(p_path => 'receipt.' || v_members(i));
             END IF;
         END LOOP;
 
@@ -269,12 +277,12 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
             v_date_emission,
             v_authorization,
             v_date_authorization,
-            NULL,
-            NULL,
+            v_receptor_identification,
+            v_receptor_business_name,
             0
-        );
+        ) RETURNING id INTO v_receipt_id;
 
-        RETURN 0;
+        RETURN v_receipt_id;
     EXCEPTION
         WHEN OTHERS THEN
             dbms_output.put_line('fun_receipt '
@@ -283,6 +291,69 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
                                  || sqlcode);
             RETURN -1;
     END fun_receipt;
+
+    PROCEDURE pro_invoice_detail (
+        p_clob       CLOB,
+        p_receipt_id NUMBER
+    ) AS
+        v_paths     apex_t_varchar2;
+        v_paths_tax apex_t_varchar2;
+        v_members   wwv_flow_t_varchar2;
+        l_count     NUMBER;
+    BEGIN
+        apex_json.parse(p_clob);
+        v_paths := apex_json.find_paths_like(p_return_path => 'receipt.details[%]');
+        dbms_output.put_line('Matching Paths: ' || v_paths.count);
+        FOR i IN 1..v_paths.count LOOP
+            dbms_output.put_line('Detail: '
+                                 || apex_json.get_varchar2(p_path => v_paths(i)
+                                                                     || '.code')
+                                 || ' '
+                                 || apex_json.get_varchar2(p_path => v_paths(i)
+                                                                     || '.description'));
+
+            v_paths_tax := apex_json.find_paths_like(p_return_path => v_paths(i) || '.taxes[%]');
+            dbms_output.put_line('Matching Paths Tax: ' || v_paths_tax.count);
+            
+            FOR i IN 1..v_paths_tax.count LOOP
+                dbms_output.put_line('Tax: '
+                                 || apex_json.get_varchar2(p_path => v_paths_tax(i)
+                                                                     || '.code')
+                                 || ' '
+                                 || apex_json.get_number(p_path => v_paths_tax(i)
+                                                                     || '.base_value'));
+            END LOOP;
+            
+            INSERT INTO remi_invoices_details (
+                receipt_id,
+                line,
+                code,
+                description,
+                quantity,
+                unit_price,
+                discount,
+                price_without_tax
+            ) VALUES (
+                p_receipt_id,
+                apex_json.get_number(p_path => v_paths(i)
+                                               || '.line'),
+                apex_json.get_varchar2(p_path => v_paths(i)
+                                                 || '.code'),
+                apex_json.get_varchar2(p_path => v_paths(i)
+                                                 || '.description'),
+                apex_json.get_number(p_path => v_paths(i)
+                                               || '.quantity'),
+                apex_json.get_number(p_path => v_paths(i)
+                                               || '.unit_price'),
+                apex_json.get_number(p_path => v_paths(i)
+                                               || '.discount'),
+                apex_json.get_number(p_path => v_paths(i)
+                                               || '.price_without_tax')
+            );
+
+        END LOOP;
+
+    END pro_invoice_detail;
 
 END pkg_remi;
 /
