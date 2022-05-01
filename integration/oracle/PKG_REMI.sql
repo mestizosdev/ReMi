@@ -298,8 +298,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
     ) AS
         v_paths     apex_t_varchar2;
         v_paths_tax apex_t_varchar2;
-        v_members   wwv_flow_t_varchar2;
-        l_count     NUMBER;
+        v_detail_id NUMBER;
     BEGIN
         apex_json.parse(p_clob);
         v_paths := apex_json.find_paths_like(p_return_path => 'receipt.details[%]');
@@ -312,18 +311,10 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
                                  || apex_json.get_varchar2(p_path => v_paths(i)
                                                                      || '.description'));
 
-            v_paths_tax := apex_json.find_paths_like(p_return_path => v_paths(i) || '.taxes[%]');
+            v_paths_tax := apex_json.find_paths_like(p_return_path => v_paths(i)
+                                                                      || '.taxes[%]');
+
             dbms_output.put_line('Matching Paths Tax: ' || v_paths_tax.count);
-            
-            FOR i IN 1..v_paths_tax.count LOOP
-                dbms_output.put_line('Tax: '
-                                 || apex_json.get_varchar2(p_path => v_paths_tax(i)
-                                                                     || '.code')
-                                 || ' '
-                                 || apex_json.get_number(p_path => v_paths_tax(i)
-                                                                     || '.base_value'));
-            END LOOP;
-            
             INSERT INTO remi_invoices_details (
                 receipt_id,
                 line,
@@ -349,7 +340,31 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
                                                || '.discount'),
                 apex_json.get_number(p_path => v_paths(i)
                                                || '.price_without_tax')
-            );
+            ) RETURNING id INTO v_detail_id;
+
+            FOR i IN 1..v_paths_tax.count LOOP
+                INSERT INTO remi_taxes (
+                    invoice_detail_id,
+                    code,
+                    code_percent,
+                    tariff,
+                    base_value,
+                    value
+                ) VALUES (
+                    v_detail_id,
+                    apex_json.get_varchar2(p_path => v_paths_tax(i)
+                                                     || '.code'),
+                    apex_json.get_varchar2(p_path => v_paths_tax(i)
+                                                     || '.code_percent'),
+                    apex_json.get_number(p_path => v_paths_tax(i)
+                                                   || '.tariff'),
+                    apex_json.get_number(p_path => v_paths_tax(i)
+                                                   || '.base_value'),
+                    apex_json.get_number(p_path => v_paths_tax(i)
+                                                   || '.value')
+                );
+
+            END LOOP;
 
         END LOOP;
 
