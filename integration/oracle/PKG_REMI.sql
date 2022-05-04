@@ -84,6 +84,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
 
         COMMIT;
         RETURN 'Success';
+    EXCEPTION
+        WHEN UTL_HTTP.transfer_timeout THEN
+            RETURN 'HTTP timeout';
+         WHEN others THEN
+            RETURN 'Call apex_web_service error';
     END fun_recover;
 
     FUNCTION fun_supplier (
@@ -104,7 +109,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
                                  || ' '
                                  || apex_json.get_varchar2(p_path => 'supplier.' || v_members(i)));
 
-            IF v_members(i) = 'identification' THEN
+            IF v_members(i) = 'identification' THEN 
                 v_identification := apex_json.get_varchar2(p_path => 'supplier.' || v_members(i));
 
             ELSIF v_members(i) = 'business_name' THEN
