@@ -17,9 +17,9 @@ BEGIN
 
   DBMS_NETWORK_ACL_ADMIN.assign_acl (
     acl         => 'server_remi_acl.xml',
-    host        => '192.168.0.120', 
-    lower_port  => 5000,
-    upper_port  => 5000); 
+    host        => 'mestizos.dev', 
+    lower_port  => 4001,
+    upper_port  => 4001); 
 
   COMMIT;
 END;
