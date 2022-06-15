@@ -1,5 +1,8 @@
 CREATE OR REPLACE PACKAGE pkg_remi AS
-    default_server CONSTANT VARCHAR2(100) := 'http://192.168.0.120:5000';
+    default_server CONSTANT VARCHAR2(100) := 'http://mestizos.dev:4001';
+    default_username CONSTANT VARCHAR2(100) := 'disme';
+    default_password CONSTANT VARCHAR2(100) := 'disme2007';
+    
     FUNCTION fun_version RETURN VARCHAR2;
 
     FUNCTION fun_index RETURN VARCHAR2;
@@ -11,12 +14,12 @@ CREATE OR REPLACE PACKAGE pkg_remi AS
     FUNCTION fun_supplier (
         p_clob CLOB
     ) RETURN NUMBER;
-    
+
     FUNCTION fun_receipt (
         p_clob CLOB,
         p_supplier_id number
     ) RETURN NUMBER;
-    
+
     procedure pro_invoice_detail (
         p_clob CLOB,
         p_receipt_id number
@@ -38,7 +41,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
     FUNCTION fun_version RETURN VARCHAR2 AS
         l_clob CLOB;
     BEGIN
-        l_clob := apex_web_service.make_rest_request(p_url => default_server || '/version', p_http_method => 'GET');
+        l_clob := apex_web_service.make_rest_request(
+            p_url => default_server || '/version', 
+            p_http_method => 'GET',
+            p_username => default_username,
+            p_password => default_password);
 
         dbms_output.put_line('status=' || apex_web_service.g_status_code);
         dbms_output.put_line('l_clob=' || l_clob);
@@ -49,7 +56,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
     FUNCTION fun_index RETURN VARCHAR2 AS
         l_clob CLOB;
     BEGIN
-        l_clob := apex_web_service.make_rest_request(p_url => default_server, p_http_method => 'GET');
+        l_clob := apex_web_service.make_rest_request(
+            p_url => default_server, 
+            p_http_method => 'GET',
+            p_username => default_username,
+            p_password => default_password);
+            
+        
         dbms_output.put_line('l_clob=' || l_clob);
         apex_json.parse(l_clob);
         dbms_output.put_line(apex_json.get_varchar2(p_path => 'application.name'));
@@ -65,9 +78,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_remi AS
         v_supplier NUMBER;
         v_receipt  NUMBER;
     BEGIN
-        v_clob := apex_web_service.make_rest_request(p_url => default_server
-                                                              || '/recover/'
-                                                              || p_access_key, p_http_method => 'GET');
+        v_clob := apex_web_service.make_rest_request(
+            p_url => default_server
+                || '/recover/'
+                || p_access_key,
+            p_http_method => 'GET',
+            p_username => default_username,
+            p_password => default_password);
 
         v_status := apex_web_service.g_status_code;
         IF v_status = 200 THEN
